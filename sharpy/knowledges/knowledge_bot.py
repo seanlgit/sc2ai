@@ -13,6 +13,7 @@ from config import get_config, get_version
 from sc2.unit import Unit
 import time
 
+
 if TYPE_CHECKING:
     from sharpy.knowledges import BuildOrder
 
@@ -39,6 +40,8 @@ class KnowledgeBot(SkeletonBot, ABC):
         self.previous_units_manager = PreviousUnitsManager()
         self.game_analyzer = GameAnalyzer()
         self.data_manager = DataManager()
+        self.tf_manager = TFManager()
+
 
     async def on_start(self):
         """Allows initializing the bot when the game data is available."""
@@ -46,6 +49,7 @@ class KnowledgeBot(SkeletonBot, ABC):
 
         managers = [
             self.memory_manager,
+            
             self.lost_units_manager,
             self.enemy_units_manager,
             self.unit_cache,
@@ -62,6 +66,7 @@ class KnowledgeBot(SkeletonBot, ABC):
             self.previous_units_manager,
             self.game_analyzer,
             self.data_manager,
+            self.tf_manager,
         ]
         if user_managers:
             managers.extend(user_managers)

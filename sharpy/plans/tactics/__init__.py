@@ -12,3 +12,4 @@ from .worker_rally_point import WorkerRallyPoint
 from .scouting import Scout, ScoutLocation
 from .distribute_workers import DistributeWorkers
 from .speed_mining import SpeedMining
+from .random_attack import PlanRandomAttack

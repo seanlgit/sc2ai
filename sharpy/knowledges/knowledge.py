@@ -21,7 +21,10 @@ from sc2.constants import *
 from sc2.position import Point2
 from typing import TYPE_CHECKING, TypeVar
 
+
 from sharpy.managers.core import LogManager
+
+
 
 if TYPE_CHECKING:
     from sharpy.knowledges import SkeletonBot
@@ -58,6 +61,7 @@ class Knowledge:
         self.roles: Optional[UnitRoleManager] = None
         self.combat_manager: Optional[ICombatManager] = None
         self.previous_units_manager: Optional[IPreviousUnitsManager] = None
+        self.tf_manager : Optional[TFManager] = None
 
         # Event listeners
         self._on_unit_destroyed_listeners: List[Callable] = list()
@@ -142,7 +146,8 @@ class Knowledge:
         self.combat_manager = self.get_manager(ICombatManager)
         self.data_manager = self.get_manager(IDataManager)
         self.previous_units_manager = self.get_manager(IPreviousUnitsManager)
-
+        self.tf_manager = self.get_manager(TFManager)
+        
         for manager in self.managers:
             await manager.start(self)
 

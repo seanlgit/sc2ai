@@ -28,6 +28,7 @@ class Component:
     roles: "UnitRoleManager"
     zone_manager: "ZoneManager"
     cd_manager: "CooldownManager"
+    tf_manager: "TFManager"
 
     def __init__(self) -> None:
         self._debug: bool = False
@@ -68,6 +69,7 @@ class Component:
         self.roles = self.knowledge.roles
         self.zone_manager = self.knowledge.zone_manager
         self.cd_manager = knowledge.cooldown_manager
+        self.tf_manager = knowledge.tf_manager
 
     def print(self, msg: str, stats: bool = True):
         self.knowledge.print(msg, type(self).__name__, stats)

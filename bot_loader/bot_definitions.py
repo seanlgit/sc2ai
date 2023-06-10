@@ -10,6 +10,7 @@ from dummies.terran import *
 from dummies.zerg import *
 from dummies.debug import *
 from sc2.player import Human, Bot, Computer, AbstractPlayer
+from dummies.protoss.BB2 import BB2
 
 races = {
     "protoss": Race.Protoss,
@@ -246,6 +247,7 @@ class BotDefinitions:
     ):
         bots: List[DummyBuilder] = [
             # Protoss
+            DummyBuilder("BB2", "Blinky", Race.Protoss, "BB2.py", BB2),
             DummyBuilder("4gate", "SharpRush", Race.Protoss, "gate4.py", Stalkers4Gate),
             DummyBuilder("adept", "SharpShades", Race.Protoss, "adept_allin.py", AdeptRush),
             DummyBuilder("cannonrush", "SharpCannons", Race.Protoss, "cannon_rush.py", CannonRush, params_count=1),
