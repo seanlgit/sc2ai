@@ -151,6 +151,7 @@ class PlanRandomAttack(ActBase):
         for unit in self.roles.units(UnitTask.Attacking):
             self.client.debug_text_world(attacking_status, unit.position3d)
 
+
     def handle_attack(self, target):
         already_attacking: Units = self.roles.units(UnitTask.Attacking)
         if not already_attacking.exists:
@@ -191,14 +192,16 @@ class PlanRandomAttack(ActBase):
         if retreat != AttackStatus.NotActive:
             self._start_retreat(retreat)
 
-    def _should_attack(self, power: ExtendedPower) -> bool:
-        '''wait_time = random.triangular(5, 45, 30)
-        if (self.last_time + wait_time > self.ai.time):
-            return True
-        self.last_time = self.ai.time 
-        result = self.knowledge.tf_manager.random_should_attack(self, power)'''
+    def _should_attack(self, power: ExtendedPower, fight_center) -> bool:
+        #wait_time = random.triangular(5, 45, 30)
+        #if (self.last_time + wait_time > self.ai.time):
+        #    return True
+        #self.last_time = self.ai.time 
+        local_enemy_power = self.get_enemy_local_power(fight_center)
+
+        #result = self.knowledge.tf_manager.random_should_attack(self, power, local_enemy_power)
    
-        result =  self.knowledge.tf_manager.tf_should_attack(self, power)
+        result =  self.knowledge.tf_manager.tf_should_attack(self, power, local_enemy_power)
     
         if (result == 0):
             return False
@@ -218,17 +221,26 @@ class PlanRandomAttack(ActBase):
 
     def _should_retreat(self, fight_center: Point2, already_attacking: Units) -> AttackStatus:
         own_power = self.unit_values.calc_total_power(already_attacking)
-        '''wait_time = random.triangular(5, 45, 30)
-        if (self.last_time + wait_time > self.ai.time):
-            return AttackStatus.NotActive
-        result = self.knowledge.tf_manager.random_should_attack(self, own_power)'''
-
-        result =  self.knowledge.tf_manager.tf_should_attack(self, own_power)
+        local_enemy_power = self.get_enemy_local_power(fight_center)
+        #wait_time = random.triangular(5, 45, 30)
+        #if (self.last_time + wait_time > self.ai.time):
+        #    return AttackStatus.NotActive
+        
+        #result = self.knowledge.tf_manager.random_should_attack(self, own_power, local_enemy_power)
+        result =  self.knowledge.tf_manager.tf_should_attack(self, own_power, local_enemy_power)
         self.last_time = self.ai.time
         if (result == 0):
             self.knowledge.print("Predict Retreat")
             return AttackStatus.Retreat
         return AttackStatus.NotActive
+    
+    def get_enemy_local_power(self,point):
+        enemy_local_units: Units = self.ai.all_enemy_units.closer_than(PlanRandomAttack.DISTANCE_TO_INCLUDE, point)
+
+        if self.unit_values.enemy_worker_type is not None:
+            enemy_local_units = enemy_local_units.exclude_type(self.unit_values.enemy_worker_type)
+        enemy_local_power = self.unit_values.calc_total_power(enemy_local_units)
+        return enemy_local_power
     
 
         enemy_local_units: Units = self.ai.all_enemy_units.closer_than(PlanRandomAttack.DISTANCE_TO_INCLUDE, fight_center)

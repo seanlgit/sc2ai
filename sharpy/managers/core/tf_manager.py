@@ -71,8 +71,7 @@ class TFManager(ManagerBase):
         for decision in trimmed_decisions:
             save_data(decision)
 
-
-    def get_input_data(self, bot, extended_power):
+    def get_input_data(self, bot, extended_power, enemy_local_power):
         def shorten(decimal):
             return round(decimal*100)
 
@@ -83,6 +82,7 @@ class TFManager(ManagerBase):
         race = race_map[self.ai.enemy_race]
         income = bot.game_analyzer.our_income_advantage.value
         eep = bot.enemy_units_manager.enemy_total_power
+        elp = enemy_local_power
         
         o_detectors = extended_power.detectors
         o_air =  shorten(extended_power.air_power)
@@ -96,6 +96,15 @@ class TFManager(ManagerBase):
         e_surround = shorten(eep.surround_power)
         e_siege = shorten(eep.siege_power)
         e_power = shorten(eep.power)
+
+        el_air =  shorten(elp.air_power)
+        el_ground = shorten(elp.ground_power)
+        el_melee = shorten(elp.melee_power)
+        el_stealth = shorten(elp.stealth_power)
+        el_surround = shorten(elp.surround_power)
+        el_siege = shorten(elp.siege_power)
+        el_power = shorten(elp.power)
+
         can_survive = 1 if bot.game_analyzer.army_can_survive else 0
         army_adv = bot.game_analyzer.our_army_advantage.value
 
@@ -103,18 +112,20 @@ class TFManager(ManagerBase):
         for unit in bot.roles.free_units:
             if self.unit_values.should_attack(unit):
                 attackers.append(unit)
+        print(len(attackers))        
         our_power = shorten(bot.unit_values.calc_total_power(attackers).power)
 
-        inputs = [[race, time, income,
+        inputs = [race, time, income,
                  o_detectors, o_air, o_ground,
                  e_air, e_ground, e_melee, e_stealth, e_surround, e_siege, 
-                 e_power, o_power, our_power, can_survive, army_adv]]
-        np_inputs = np.array(inputs, dtype=np.float32)
-        return np_inputs
+                 el_air, el_ground, el_melee, el_stealth, el_surround, el_siege, el_power,
+                 e_power, o_power, our_power, can_survive, army_adv]
+        
+        return inputs
 
-    def random_should_attack(self, bot, extended_power) -> bool:
+    def random_should_attack(self, bot, extended_power, enemy_local_power) -> bool:
 
-        inputs = TFManager.get_input_data(self, bot, extended_power)
+        inputs = TFManager.get_input_data(self, bot, extended_power, enemy_local_power)
         
         result = random.choice([0,1,2])
         
@@ -124,10 +135,10 @@ class TFManager(ManagerBase):
         #model.save_data(inputs, result)
         return result
     
-    def tf_should_attack(self, bot, extended_power):
-        inputs = self.get_input_data(bot, extended_power)
-        
-        self.interpreter.set_tensor(self.input_details[0]['index'], inputs)
+    def tf_should_attack(self, bot, extended_power, enemy_local_power):
+        inputs = [self.get_input_data(bot, extended_power, enemy_local_power)]
+        np_inputs = np.array(inputs, dtype=np.float32)
+        self.interpreter.set_tensor(self.input_details[0]['index'], np_inputs)
         self.interpreter.invoke()
         output_data = self.interpreter.get_tensor(self.output_details[0]['index'])
         decision = np.argmax(np.array(output_data))
