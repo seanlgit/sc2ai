@@ -137,7 +137,7 @@ class TFManager(ManagerBase):
     
     def tf_should_attack(self, bot, extended_power, enemy_local_power):
         inputs = [self.get_input_data(bot, extended_power, enemy_local_power)]
-        np_inputs = np.array(inputs, dtype=np.float32)
+        np_inputs = np.array(inputs, dtype=np.int32)
         self.interpreter.set_tensor(self.input_details[0]['index'], np_inputs)
         self.interpreter.invoke()
         output_data = self.interpreter.get_tensor(self.output_details[0]['index'])
