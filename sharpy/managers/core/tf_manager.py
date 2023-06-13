@@ -124,24 +124,26 @@ class TFManager(ManagerBase):
         return inputs
 
     def random_should_attack(self, bot, extended_power, enemy_local_power) -> bool:
-
-        inputs = TFManager.get_input_data(self, bot, extended_power, enemy_local_power)
-        
-        result = random.choice([0,1,2])
+        inputs = self.get_input_data(self, bot, extended_power, enemy_local_power)
+        prediciton = random.choice([0,1,2])
         
         # Save inputs and resuls
-        decision = inputs + [result]
+        decision = inputs + [prediciton]
         self.decisions.append(decision)
-        #model.save_data(inputs, result)
-        return result
+        #model.save_data(inputs, prediciton)
+        return prediciton
     
     def tf_should_attack(self, bot, extended_power, enemy_local_power):
-        inputs = [self.get_input_data(bot, extended_power, enemy_local_power)]
-        np_inputs = np.array(inputs, dtype=np.int32)
+        inputs = self.get_input_data(bot, extended_power, enemy_local_power)
+        np_inputs = np.array([inputs], dtype=np.int32)
         self.interpreter.set_tensor(self.input_details[0]['index'], np_inputs)
         self.interpreter.invoke()
         output_data = self.interpreter.get_tensor(self.output_details[0]['index'])
-        decision = np.argmax(np.array(output_data))
+        prediction = np.argmax(np.array(output_data))
+
+        decision = inputs + [prediction]
+        self.decisions.append(decision)
+
         return decision
     '''
             prediction = self.predic_model.predict([inputs])
