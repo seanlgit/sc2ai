@@ -46,7 +46,7 @@ class TFManager(ManagerBase):
 
     def endgame(self, result):
         def save_data(decisions):
-            with open('training_data.txt', 'a') as file:
+            with open('./data/training_data.txt', 'a') as file:
                 line = ' '.join([str(decision) for decision in decisions]) + '\n'
                 file.write(line)
 
@@ -111,8 +111,7 @@ class TFManager(ManagerBase):
         attackers = Units([], self.ai)
         for unit in bot.roles.free_units:
             if self.unit_values.should_attack(unit):
-                attackers.append(unit)
-        print(len(attackers))        
+                attackers.append(unit)     
         our_power = shorten(bot.unit_values.calc_total_power(attackers).power)
 
         inputs = [race, time, income,
