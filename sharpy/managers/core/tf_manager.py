@@ -46,7 +46,7 @@ class TFManager(ManagerBase):
 
     def endgame(self, result):
         def save_data(decisions):
-            with open('./data/training_data.txt', 'a') as file:
+            with open('./training_data.txt', 'a') as file:
                 line = ' '.join([str(decision) for decision in decisions]) + '\n'
                 file.write(line)
 
